@@ -1,0 +1,46 @@
+{
+	"name": "pl_test",
+	"properties": {
+		"activities": [
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "message",
+					"value": {
+						"value": "@concat('This is from',pipeline().DataFactory,'.welcome',pipeline().parameters.mypar)",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"mypar": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"number": {
+				"type": "Array",
+				"defaultValue": [
+					1,
+					2,
+					3,
+					4,
+					5,
+					6,
+					7,
+					8
+				]
+			},
+			"message": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-05-22T10:12:37Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

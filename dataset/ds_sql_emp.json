@@ -1,0 +1,50 @@
+{
+	"name": "ds_sql_emp",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_sqldemo",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "surrkey",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "emp_id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "emp_name",
+				"type": "varchar"
+			},
+			{
+				"name": "gender",
+				"type": "varchar"
+			},
+			{
+				"name": "salary",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "country",
+				"type": "varchar"
+			},
+			{
+				"name": "isactive",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "tbl_employee"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

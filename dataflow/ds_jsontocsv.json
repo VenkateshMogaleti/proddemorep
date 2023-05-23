@@ -1,0 +1,61 @@
+{
+	"name": "ds_jsontocsv",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_salesjson",
+						"type": "DatasetReference"
+					},
+					"name": "srcjson"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_outputcsv",
+						"type": "DatasetReference"
+					},
+					"name": "outputcsv"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flatten1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Country as string,",
+				"          {SO Id} as short,",
+				"          SODate as date,",
+				"          Sales as (Item as short, Qty as short, Value as double)[]",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'arrayOfDocuments',",
+				"     dateFormats: ['dd-MM-yyyy','s']) ~> srcjson",
+				"srcjson foldDown(unroll(Sales, Sales),",
+				"     mapColumn(",
+				"          country = Country,",
+				"          soid = {SO Id},",
+				"          sodate = SODate,",
+				"          Item = Sales.Item,",
+				"          Qty = Sales.Qty,",
+				"          Value = Sales.Value",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten1",
+				"flatten1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['sales_csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> outputcsv"
+			]
+		}
+	}
+}

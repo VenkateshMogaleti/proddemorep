@@ -1,0 +1,177 @@
+{
+	"name": "dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_input_blob_csv",
+						"type": "DatasetReference"
+					},
+					"name": "empfile"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_sql_emp",
+						"type": "DatasetReference"
+					},
+					"name": "sqlreference"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_sql_emp",
+						"type": "DatasetReference"
+					},
+					"name": "destsqldb"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_sql_emp",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "newcolumnIsactive"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "alterRow1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          empid as integer,",
+				"          ename as string,",
+				"          gender as string,",
+				"          salary as integer,",
+				"          country as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     dateFormats: ['date']) ~> empfile",
+				"source(output(",
+				"          surrkey as integer,",
+				"          emp_id as integer,",
+				"          emp_name as string,",
+				"          gender as string,",
+				"          salary as integer,",
+				"          country as string,",
+				"          isactive as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> sqlreference",
+				"empfile derive(isactive = 1) ~> newcolumnIsactive",
+				"sqlreference select(mapColumn(",
+				"          sql_surrkey = surrkey,",
+				"          sql_emp_id = emp_id,",
+				"          sql_emp_name = emp_name,",
+				"          sql_gender = gender,",
+				"          sql_salary = salary,",
+				"          sql_country = country,",
+				"          sql_isactive = isactive",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"empfile, select1 lookup(empid == sql_emp_id,",
+				"     multiple: true,",
+				"     broadcast: 'auto',",
+				"     pickup: 'any')~> lookup1",
+				"lookup1 filter(!isNull(sql_emp_id)) ~> filter1",
+				"filter1 select(mapColumn(",
+				"          sql_surrkey,",
+				"          sql_emp_id,",
+				"          sql_emp_name,",
+				"          sql_gender,",
+				"          sql_salary,",
+				"          sql_country,",
+				"          sql_isactive",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"select2 derive(sql_isactive = 0) ~> derivedColumn1",
+				"derivedColumn1 alterRow(updateIf(1==1)) ~> alterRow1",
+				"newcolumnIsactive sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          surrkey as integer,",
+				"          emp_id as integer,",
+				"          emp_name as string,",
+				"          gender as string,",
+				"          salary as integer,",
+				"          country as string,",
+				"          isactive as integer",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     saveOrder: 2,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          emp_id = empid,",
+				"          emp_name = ename,",
+				"          gender,",
+				"          salary,",
+				"          country,",
+				"          isactive",
+				"     )) ~> destsqldb",
+				"alterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          surrkey as integer,",
+				"          emp_id as integer,",
+				"          emp_name as string,",
+				"          gender as string,",
+				"          salary as integer,",
+				"          country as string,",
+				"          isactive as integer",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:false,",
+				"     updateable:true,",
+				"     upsertable:false,",
+				"     keys:['surrkey'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     saveOrder: 1,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          surrkey = sql_surrkey,",
+				"          emp_id = sql_emp_id,",
+				"          emp_name = sql_emp_name,",
+				"          gender = sql_gender,",
+				"          salary = sql_salary,",
+				"          country = sql_country,",
+				"          isactive = sql_isactive",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}
