@@ -26,8 +26,6 @@
 						}
 					},
 					"fieldList": [
-						"columnCount",
-						"structure",
 						"exists"
 					],
 					"storeSettings": {
