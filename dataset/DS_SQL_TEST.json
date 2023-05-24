@@ -1,0 +1,12 @@
+{
+	"name": "DS_SQL_TEST",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_demosqladf",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}
