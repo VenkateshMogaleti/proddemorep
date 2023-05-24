@@ -1,0 +1,39 @@
+{
+	"name": "DS_SQL_GENERIC",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_SQL_GENERIC",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"sql_connection": {
+					"value": "@dataset().sql_connection",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"sql_connection": {
+				"type": "string"
+			},
+			"schema_name": {
+				"type": "string"
+			},
+			"table_name": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().schema_name",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().table_name",
+				"type": "Expression"
+			}
+		}
+	}
+}
