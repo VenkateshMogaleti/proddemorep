@@ -1,0 +1,57 @@
+{
+	"name": "ds_blob_ls_generic",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_BLOB_GENERIC",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"STORAGE_BLOB": {
+					"value": "@dataset().blob_storage",
+					"type": "Expression"
+				},
+				"SECRET_ACCESSKEY": {
+					"value": "@dataset().secret_key",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"blob_storage": {
+				"type": "string"
+			},
+			"secret_key": {
+				"type": "string"
+			},
+			"container": {
+				"type": "string"
+			},
+			"foldername": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().filename",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().foldername",
+					"type": "Expression"
+				},
+				"container": {
+					"value": "@dataset().container",
+					"type": "Expression"
+				}
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}

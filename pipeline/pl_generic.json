@@ -1,0 +1,45 @@
+{
+	"name": "pl_generic",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get Metadata1",
+				"type": "GetMetadata",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "ds_blob_ls_generic",
+						"type": "DatasetReference",
+						"parameters": {
+							"blob_storage": "adfblob431sa",
+							"secret_key": "secret-accesskey",
+							"container": "multiplefiles",
+							"foldername": "Emails_data.csv"
+						}
+					},
+					"fieldList": [
+						"columnCount",
+						"structure",
+						"exists"
+					],
+					"storeSettings": {
+						"type": "AzureBlobStorageReadSettings",
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
+					}
+				}
+			}
+		],
+		"annotations": []
+	}
+}
