@@ -1,0 +1,71 @@
+{
+	"name": "pl_sqltoblob",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data from sql to blob",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_SQL_GENERIC",
+						"type": "DatasetReference",
+						"parameters": {
+							"sql_connection": "adf-sql-connection",
+							"schema_name": "saleslt",
+							"table_name": "address"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_blob_ls_generic",
+						"type": "DatasetReference",
+						"parameters": {
+							"blob_storage": "adfblob431sa",
+							"secret_key": "secret-accesskey",
+							"container": "output",
+							"foldername": "address.csv"
+						}
+					}
+				]
+			}
+		],
+		"annotations": []
+	}
+}
