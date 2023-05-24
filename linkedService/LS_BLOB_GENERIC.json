@@ -1,0 +1,31 @@
+{
+	"name": "LS_BLOB_GENERIC",
+	"properties": {
+		"parameters": {
+			"STORAGE_BLOB": {
+				"type": "String",
+				"defaultValue": "adfblob431sa"
+			},
+			"SECRET_ACCESSKEY": {
+				"type": "String",
+				"defaultValue": "secret-accesskey"
+			}
+		},
+		"annotations": [],
+		"type": "AzureBlobStorage",
+		"typeProperties": {
+			"connectionString": "DefaultEndpointsProtocol=https;AccountName=@{linkedService().STORAGE_BLOB};",
+			"accountKey": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "AzureKeyVault2",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": {
+					"value": "@linkedService().SECRET_ACCESSKEY",
+					"type": "Expression"
+				}
+			}
+		}
+	}
+}
