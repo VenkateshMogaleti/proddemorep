@@ -19,15 +19,97 @@
 					"name": "sourceproductcategory"
 				}
 			],
-			"sinks": [],
-			"transformations": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_BLOB_CSV_FILE_GENERIC",
+						"type": "DatasetReference"
+					},
+					"name": "roadbikesproduct"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_BLOB_CSV_FILE_GENERIC",
+						"type": "DatasetReference"
+					},
+					"name": "sink2"
+				}
+			],
+			"transformations": [
+				{
+					"name": "join1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "split1"
+				}
+			],
 			"scriptLines": [
-				"source(allowSchemaDrift: true,",
+				"source(output(",
+				"          ProductID as short,",
+				"          Name as string,",
+				"          ProductNumber as string,",
+				"          Color as string,",
+				"          StandardCost as double,",
+				"          ListPrice as double,",
+				"          Size as string,",
+				"          Weight as double,",
+				"          ProductCategoryID as short,",
+				"          ProductModelID as short,",
+				"          SellStartDate as string,",
+				"          SellEndDate as string,",
+				"          DiscontinuedDate as string,",
+				"          ThumbNailPhoto as string,",
+				"          ThumbnailPhotoFileName as string,",
+				"          rowguid as string,",
+				"          ModifiedDate as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> sourceproduct",
-				"source(allowSchemaDrift: true,",
+				"source(output(",
+				"          ProductCategoryID as short,",
+				"          ParentProductCategoryID as short,",
+				"          Name as string,",
+				"          rowguid as string,",
+				"          ModifiedDate as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     ignoreNoFilesFound: false) ~> sourceproductcategory"
+				"     ignoreNoFilesFound: false) ~> sourceproductcategory",
+				"sourceproduct, sourceproductcategory join(sourceproduct@ProductCategoryID == sourceproductcategory@ProductCategoryID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join1 select(mapColumn(",
+				"          ProductID,",
+				"          productName = sourceproduct@Name,",
+				"          productcategoryName = sourceproductcategory@Name,",
+				"          ProductNumber,",
+				"          Color,",
+				"          StandardCost,",
+				"          ProductCategoryID = sourceproduct@ProductCategoryID,",
+				"          ParentProductCategoryID",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 split(productcategoryName == 'Road Frames',",
+				"     disjoint: false) ~> split1@(roadbikesproducts, productothers)",
+				"split1@roadbikesproducts sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['roadbikes.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> roadbikesproduct",
+				"split1@productothers sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['otherproductcatergory.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink2"
 			]
 		}
 	}
