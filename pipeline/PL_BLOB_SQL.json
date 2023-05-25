@@ -53,94 +53,6 @@
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "Copy data1",
-							"type": "Copy",
-							"dependsOn": [
-								{
-									"activity": "Get Metadata1",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"source": {
-									"type": "DelimitedTextSource",
-									"storeSettings": {
-										"type": "AzureBlobStorageReadSettings",
-										"recursive": true,
-										"enablePartitionDiscovery": false
-									},
-									"formatSettings": {
-										"type": "DelimitedTextReadSettings"
-									}
-								},
-								"sink": {
-									"type": "AzureSqlSink",
-									"writeBehavior": "insert",
-									"sqlWriterUseTableLock": false,
-									"tableOption": "autoCreate",
-									"disableMetricsCollection": false
-								},
-								"enableStaging": false,
-								"translator": {
-									"type": "TabularTranslator",
-									"typeConversion": true,
-									"typeConversionSettings": {
-										"allowDataTruncation": true,
-										"treatBooleanAsNumber": false
-									}
-								}
-							},
-							"inputs": [
-								{
-									"referenceName": "ds_blob_ls_generic",
-									"type": "DatasetReference",
-									"parameters": {
-										"blob_storage": "adfblob431sa",
-										"secret_key": "secret-accesskey",
-										"container": {
-											"value": "@item().containername",
-											"type": "Expression"
-										},
-										"foldername": {
-											"value": "@item().foldername",
-											"type": "Expression"
-										},
-										"filename": {
-											"value": "@item().filename1",
-											"type": "Expression"
-										}
-									}
-								}
-							],
-							"outputs": [
-								{
-									"referenceName": "DS_SQL_GENERIC",
-									"type": "DatasetReference",
-									"parameters": {
-										"sql_connection": "adf-sql-connection",
-										"schema_name": {
-											"value": "@item().newschema",
-											"type": "Expression"
-										},
-										"table_name": {
-											"value": "@item().tablename",
-											"type": "Expression"
-										}
-									}
-								}
-							]
-						},
-						{
 							"name": "Get Metadata1",
 							"type": "GetMetadata",
 							"dependsOn": [],
@@ -155,9 +67,25 @@
 							"typeProperties": {
 								"dataset": {
 									"referenceName": "DS_BLOB_CSV_FILE_GENERIC",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"Container": {
+											"value": "@item().containername",
+											"type": "Expression"
+										},
+										"foldername": {
+											"value": "@item().foldername",
+											"type": "Expression"
+										},
+										"filename": {
+											"value": "@item().filename1",
+											"type": "Expression"
+										}
+									}
 								},
-								"fieldList": [],
+								"fieldList": [
+									"exists"
+								],
 								"storeSettings": {
 									"type": "AzureBlobStorageReadSettings",
 									"enablePartitionDiscovery": false
@@ -166,11 +94,136 @@
 									"type": "DelimitedTextReadSettings"
 								}
 							}
+						},
+						{
+							"name": "If Condition1",
+							"type": "IfCondition",
+							"dependsOn": [
+								{
+									"activity": "Get Metadata1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@activity('Get Metadata1').output.exists",
+									"type": "Expression"
+								},
+								"ifFalseActivities": [
+									{
+										"name": "Append variable1",
+										"type": "AppendVariable",
+										"dependsOn": [],
+										"userProperties": [],
+										"typeProperties": {
+											"variableName": "Tableextracted",
+											"value": {
+												"value": "@concat(item().containername,'/',item().foldername,'/',item().filename1)",
+												"type": "Expression"
+											}
+										}
+									}
+								],
+								"ifTrueActivities": [
+									{
+										"name": "Copy data1",
+										"type": "Copy",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "DelimitedTextSource",
+												"storeSettings": {
+													"type": "AzureBlobStorageReadSettings",
+													"recursive": true,
+													"enablePartitionDiscovery": false
+												},
+												"formatSettings": {
+													"type": "DelimitedTextReadSettings"
+												}
+											},
+											"sink": {
+												"type": "AzureSqlSink",
+												"preCopyScript": {
+													"value": "@{concat('Truncate table',item().newschema, item().tablename)}",
+													"type": "Expression"
+												},
+												"writeBehavior": "insert",
+												"sqlWriterUseTableLock": false,
+												"disableMetricsCollection": false
+											},
+											"enableStaging": false,
+											"translator": {
+												"type": "TabularTranslator",
+												"typeConversion": true,
+												"typeConversionSettings": {
+													"allowDataTruncation": true,
+													"treatBooleanAsNumber": false
+												}
+											}
+										},
+										"inputs": [
+											{
+												"referenceName": "ds_blob_ls_generic",
+												"type": "DatasetReference",
+												"parameters": {
+													"blob_storage": "adfblob431sa",
+													"secret_key": "secret-accesskey",
+													"container": {
+														"value": "@item().containername",
+														"type": "Expression"
+													},
+													"foldername": {
+														"value": "@item().foldername",
+														"type": "Expression"
+													},
+													"filename": {
+														"value": "@item().filename1",
+														"type": "Expression"
+													}
+												}
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "DS_SQL_GENERIC",
+												"type": "DatasetReference",
+												"parameters": {
+													"sql_connection": "adf-sql-connection",
+													"schema_name": {
+														"value": "@item().newschema",
+														"type": "Expression"
+													},
+													"table_name": {
+														"value": "@item().tablename",
+														"type": "Expression"
+													}
+												}
+											}
+										]
+									}
+								]
+							}
 						}
 					]
 				}
 			}
 		],
+		"variables": {
+			"Tableextracted": {
+				"type": "Array"
+			}
+		},
 		"annotations": []
 	}
 }
