@@ -100,7 +100,11 @@
 										"blob_storage": "adfdemo431sa",
 										"secret_key": "secret-accesskey",
 										"container": "ouput",
-										"foldername": "salesLT"
+										"foldername": "salesLT",
+										"filename": {
+											"value": "@item().filename1",
+											"type": "Expression"
+										}
 									}
 								}
 							],
