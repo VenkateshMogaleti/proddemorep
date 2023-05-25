@@ -20,7 +20,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"Container": "multiplefiles",
-							"Filename": "employee.csv.txt"
+							"foldername": "employee.csv.txt"
 						}
 					},
 					"fieldList": [
@@ -29,6 +29,7 @@
 					],
 					"storeSettings": {
 						"type": "AzureBlobStorageReadSettings",
+						"recursive": true,
 						"enablePartitionDiscovery": false
 					},
 					"formatSettings": {
