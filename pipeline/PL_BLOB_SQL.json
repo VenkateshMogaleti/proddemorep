@@ -155,7 +155,7 @@
 											"sink": {
 												"type": "AzureSqlSink",
 												"preCopyScript": {
-													"value": "@{concat('Truncate table',item().newschema,'.', item().tablename)}",
+													"value": "@{concat('Truncate table ',item().newschema,'.', item().tablename)}",
 													"type": "Expression"
 												},
 												"writeBehavior": "insert",
