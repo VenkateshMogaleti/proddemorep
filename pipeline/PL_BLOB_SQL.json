@@ -50,6 +50,7 @@
 						"value": "@activity('Get the table names').output.value",
 						"type": "Expression"
 					},
+					"isSequential": true,
 					"activities": [
 						{
 							"name": "Copy data1",
@@ -97,10 +98,16 @@
 									"referenceName": "ds_blob_ls_generic",
 									"type": "DatasetReference",
 									"parameters": {
-										"blob_storage": "adfdemo431sa",
+										"blob_storage": "adfblob431sa",
 										"secret_key": "secret-accesskey",
-										"container": "ouput",
-										"foldername": "salesLT",
+										"container": {
+											"value": "@item().containername",
+											"type": "Expression"
+										},
+										"foldername": {
+											"value": "@item().foldername",
+											"type": "Expression"
+										},
 										"filename": {
 											"value": "@item().filename1",
 											"type": "Expression"
