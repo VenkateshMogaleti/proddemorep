@@ -1,0 +1,135 @@
+{
+	"name": "pl_SQL_BLOB_INCREMENTAL",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get the tables",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "select * from [dbo].[importtable] where isenable = 1",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DS_SQL_GENERIC",
+						"type": "DatasetReference",
+						"parameters": {
+							"sql_connection": "adf-sql-connection",
+							"schema_name": "SalesLT",
+							"table_name": "Address"
+						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get the tables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get the tables').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "@concat('select * from ',item().schemaname,'.',item().tablename, ' where ', item().incrementalcolumn, ' Between ', '''item().Lastextracteddate''', ' AND ', '''formatDateTime(utcnow(),yyyy-MM-dd hh:mm:ss)''')",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobStorageWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "DS_SQL_GENERIC",
+									"type": "DatasetReference",
+									"parameters": {
+										"sql_connection": "adf-sql-connection",
+										"schema_name": "SalesLT",
+										"table_name": "address"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DS_BLOB_CSV_FILE_GENERIC",
+									"type": "DatasetReference",
+									"parameters": {
+										"Container": {
+											"value": "@item().containername",
+											"type": "Expression"
+										},
+										"foldername": {
+											"value": "@item().foldername",
+											"type": "Expression"
+										},
+										"filename": {
+											"value": "@item().filename1",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"annotations": []
+	}
+}
