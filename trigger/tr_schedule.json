@@ -1,0 +1,25 @@
+{
+	"name": "tr_schedule",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "pl_wait",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Minute",
+				"interval": 2,
+				"startTime": "2023-05-27T13:31:00Z",
+				"endTime": "2023-05-27T13:40:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}
