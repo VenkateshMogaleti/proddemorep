@@ -125,11 +125,55 @@
 									}
 								}
 							]
+						},
+						{
+							"name": "Script1",
+							"type": "Script",
+							"dependsOn": [
+								{
+									"activity": "Copy data1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"linkedServiceName": {
+								"referenceName": "LS_SQL_GENERIC",
+								"type": "LinkedServiceReference",
+								"parameters": {
+									"sql_connection": "adf-sql-connection"
+								}
+							},
+							"typeProperties": {
+								"scripts": [
+									{
+										"type": "Query",
+										"text": {
+											"value": "@concat('update  [dbo].[importtable] set Lastextracteddate =''',formatDateTime(utcnow(),'yyyy-MM-dd hh:mm:ss'),''' where tablename =''', pipeline().DataFactory,'''' )",
+											"type": "Expression"
+										}
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
+							}
 						}
 					]
 				}
 			}
 		],
+		"variables": {
+			"update": {
+				"type": "String"
+			}
+		},
 		"annotations": []
 	}
 }
