@@ -67,7 +67,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "@concat('select * from ',item().schemaname,'.',item().tablename, ' where ', item().incrementalcolumn, ' Between ', '''item().Lastextracteddate''', ' AND ', '''formatDateTime(utcnow(),yyyy-MM-dd hh:mm:ss)''')",
+										"value": "@concat('select * from ',item().schemaname,'.',item().tablename, ' where ', item().incrementalcolumn, ' Between ''', item().Lastextracteddate, ''' AND ''', formatDateTime(utcnow(),'yyyy-MM-dd hh:mm:ss'),'''')",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",
