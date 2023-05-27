@@ -157,7 +157,7 @@
 									{
 										"type": "Query",
 										"text": {
-											"value": "@concat('update  [dbo].[importtable] set Lastextracteddate =''',formatDateTime(utcnow(),'yyyy-MM-dd hh:mm:ss'),''' where tablename =''', pipeline().DataFactory,'''' )",
+											"value": "@concat('update  [dbo].[importtable] set Lastextracteddate =''',formatDateTime(utcnow(),'yyyy-MM-dd hh:mm:ss'),''' where tablename =''', item().tablename,'''' )",
 											"type": "Expression"
 										}
 									}
