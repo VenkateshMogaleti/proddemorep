@@ -1,0 +1,37 @@
+{
+	"name": "Ds_SQL_Sales",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_SQL",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "saledate",
+				"type": "date"
+			},
+			{
+				"name": "saleitem",
+				"type": "varchar"
+			},
+			{
+				"name": "country",
+				"type": "varchar"
+			},
+			{
+				"name": "quantity",
+				"type": "varchar"
+			},
+			{
+				"name": "filename",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "tbl_sales"
+		}
+	}
+}

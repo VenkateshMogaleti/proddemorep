@@ -1,0 +1,108 @@
+{
+	"name": "Handleserrorrows",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Ds_salesIND",
+						"type": "DatasetReference"
+					},
+					"name": "SalesIND"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Ds_sql_badsales",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				},
+				{
+					"dataset": {
+						"referenceName": "Ds_SQL_Sales",
+						"type": "DatasetReference"
+					},
+					"name": "Goodrows"
+				}
+			],
+			"transformations": [
+				{
+					"name": "split1"
+				},
+				{
+					"name": "filenameerrorrows"
+				},
+				{
+					"name": "filenamegoodrows"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          salesdate as string,",
+				"          salesitems as string,",
+				"          country as string,",
+				"          quantity as short",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> SalesIND",
+				"SalesIND split(isNull(toDate(salesdate, 'dd-MMM-yyyy')),",
+				"     disjoint: false) ~> split1@(errorrows, Goodrows)",
+				"split1@errorrows derive(filename = 'salesind_2020_May_01.csv') ~> filenameerrorrows",
+				"split1@Goodrows derive(filename = 'salesind_2020_May_01.csv',",
+				"          Saledate = toDate(salesdate, 'dd-MMM-yyyy')) ~> filenamegoodrows",
+				"filenameerrorrows sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          saledate as string,",
+				"          saleitem as string,",
+				"          country as string,",
+				"          quantity as string,",
+				"          filename as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          saledate = salesdate,",
+				"          saleitem = salesitems,",
+				"          country,",
+				"          quantity,",
+				"          filename",
+				"     )) ~> sink1",
+				"filenamegoodrows sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          saledate as date,",
+				"          saleitem as string,",
+				"          country as string,",
+				"          quantity as string,",
+				"          filename as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          saledate = Saledate,",
+				"          saleitem = salesitems,",
+				"          country,",
+				"          quantity,",
+				"          filename",
+				"     )) ~> Goodrows"
+			]
+		}
+	}
+}
