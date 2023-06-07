@@ -10,6 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
+				"folderPath": "employees",
 				"container": "output"
 			},
 			"columnDelimiter": ",",
