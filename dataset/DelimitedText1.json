@@ -1,5 +1,5 @@
 {
-	"name": "ds_INPUTFILESBLOB",
+	"name": "DelimitedText1",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_blob",
@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"container": "input"
+				"container": "output"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
@@ -19,23 +19,23 @@
 		},
 		"schema": [
 			{
-				"name": "empid",
+				"name": "customerid",
 				"type": "String"
 			},
 			{
-				"name": "ename",
+				"name": "customername",
 				"type": "String"
 			},
 			{
-				"name": "gender",
+				"name": "salesperson",
 				"type": "String"
 			},
 			{
-				"name": "salary",
+				"name": "hobbies",
 				"type": "String"
 			},
 			{
-				"name": "country",
+				"name": "modifydate",
 				"type": "String"
 			}
 		]
